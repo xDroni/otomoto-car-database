@@ -1,0 +1,15 @@
+{
+  "extends": ["plugin:prettier/recommended"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prefer-const": 2,
+    "sort-imports": "off",
+    "import/order": "off"
+  },
+  "parserOptions": {
+      "ecmaVersion": 2018
+  },
+  "env": {
+      "es6": true
+  }
+}
