@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-const fs = require('fs');
 const cheerio = require('cheerio');
 
 const coreURL = 'https://www.otomoto.pl/';
@@ -17,7 +16,7 @@ async function getData(car) {
 
   const carEntries = $('article');
 
-  const result = carEntries
+  return carEntries
     .map((i, e) => {
       let image;
       try {
@@ -32,64 +31,61 @@ async function getData(car) {
       }
 
       return {
-        id: $(e)
+        car_id: $(e)
           .find('a[class="offer-title__link"]')
           .attr('data-ad-id')
           .trim(),
-        carModel:
+        car_model:
           $(e)
             .find('a[class="offer-title__link"]')
             .attr('title')
             .trim() || null,
-        description:
+        car_description:
           $(e)
             .find('h3')
             .text()
             .trim() || null,
-        productionYear:
+        car_productionYear:
           $(e)
             .find('li[data-code="year"]')
             .text()
             .trim() || null,
-        mileage:
+        car_mileage:
           $(e)
             .find('li[data-code="mileage"]')
             .text()
             .trim() || null,
-        engineCapacity:
+        car_engineCapacity:
           $(e)
             .find('li[data-code="engine_capacity"]')
             .text()
             .trim() || null,
-        fuelType:
+        car_fuelType:
           $(e)
             .find('li[data-code="fuel_type"]')
             .text()
             .trim() || null,
-        city:
+        car_city:
           $(e)
             .find('span[class="ds-location-city"]')
             .text()
             .trim() || null,
-        region:
+        car_region:
           $(e)
             .find('span[class="ds-location-region"]')
             .text()
             .trim()
             .replace(/[()]/g, '') || null,
-        fullPage:
+        car_fullPage:
           $(e)
             .find('a[class="offer-title__link"]')
             .attr('href')
             .trim()
             .replace(/#[A-Za-z0-9]*/g, '') || null,
-        image
+        car_image: image
       };
     })
     .get();
-
-  fs.writeFileSync('output.json', JSON.stringify(result, null, 2));
-  return result;
 }
 
 module.exports = { getData };
