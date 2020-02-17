@@ -10,7 +10,9 @@ async function getData(car) {
   const data = await fetch(`${coreURL}${DEFAULTS.type}/${car}/`)
     .then(res => res.text())
     .then(res => res)
-    .catch(err => err);
+    .catch(err => {
+      console.error(err);
+    });
 
   const $ = cheerio.load(data);
 
