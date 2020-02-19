@@ -8,7 +8,6 @@ function App() {
   return (
     <Router>
       <div className="container">
-        <h3>otomoto database</h3>
         <Route path="/" exact component={ CarsListComponent } />
       </div>
     </Router>

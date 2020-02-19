@@ -5,6 +5,9 @@ const Car = new Schema({
   car_id: {
     type: Number
   },
+  car_name: {
+    type: String
+  },
   car_model: {
     type: String
   },
@@ -33,6 +36,12 @@ const Car = new Schema({
     type: String
   },
   car_image: {
+    type: String
+  },
+  car_price: {
+    type: String
+  },
+  car_priceCurrency: {
     type: String
   }
 });

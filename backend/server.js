@@ -7,34 +7,17 @@ const carRoutes = express.Router();
 const PORT = 4000;
 
 const Car = require('./car.model');
-const core = require('./src/core');
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/cars', carRoutes);
 
-carRoutes.route('/').get((req, res) => {
-  Car.find((err, cars) => {
-    if (err) {
-      console.error(err);
-    } else {
-      res.json(cars);
-    }
-  });
+carRoutes.route('/').get(paginatedResults(Car), (req, res) => {
+  res.json(res.paginatedResults);
 });
 
-carRoutes.route('/add').post(async function(req, res) {
-  const carModel = req.body.car_model;
-  const cars = await core.getData(carModel);
-
-  try {
-    for (const car of cars) {
-      Car.update({ car_id: car.car_id }, car, { upsert: true });
-    }
-    return res.status(200).send('Succesfully saved.');
-  } catch (e) {
-    return res.status(500).send({ error: e });
-  }
+carRoutes.route('/:car').get(paginatedResults(Car), (req, res) => {
+  res.json(res.paginatedResults);
 });
 
 mongoose.connect('mongodb://127.0.0.1:27017/cars', { useNewUrlParser: true });
@@ -47,3 +30,49 @@ connection.once('open', function() {
 app.listen(PORT, function() {
   console.log('Server is running on Port: ' + PORT);
 });
+
+function paginatedResults(model) {
+  return async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    let query = {};
+    if (req.params.car) {
+      query = { car_name: req.params.car };
+    }
+    const count = await model
+      .find(query)
+      .countDocuments()
+      .exec();
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const results = {};
+    if (endIndex < count) {
+      results.next = {
+        page: page + 1,
+        limit: limit
+      };
+    }
+
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit: limit
+      };
+    }
+
+    try {
+      results.results = await model
+        .find(query)
+        .limit(limit)
+        .skip(startIndex)
+        .exec();
+      results.count = count;
+      res.paginatedResults = results;
+      next();
+    } catch (e) {
+      res.status(500).json({ message: e.message });
+    }
+  };
+}

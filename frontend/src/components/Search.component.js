@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 export default class Search extends Component {
 
   constructor(props) {
     super(props);
 
-    this.onChangeCarModel = this.onChangeCarModel.bind(this);
+    this.onChangeCarName = this.onChangeCarName.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
 
     this.state = {
-      car_model: 'audi',
+      car_name: 'volkswagen',
     }
   }
 
-  onChangeCarModel(e) {
+  onChangeCarName(e) {
     this.setState({
-      car_model: e.target.value
+      car_name: e.target.value
     })
   }
 
@@ -23,22 +24,34 @@ export default class Search extends Component {
     e.preventDefault();
 
     console.log(`Form submitted:`);
-    console.log(`Car model: ${this.state.car_model}`);
+    console.log(`Car model: ${this.state.car_name}`);
 
-    this.setState({
-      car_model: 'audi'
-    })
+    if(this.state.car_name === 'wszystkie') {
+      this.props.changeState({
+        currentPage: 1,
+        carName: ''
+      });
+    } else {
+      axios.get(`http://localhost:4000/cars/${this.state.car_name}`).then(res => {
+        this.props.changeState({
+          cars: res.data.results,
+          currentPage: 1,
+          carName: this.state.car_name
+        });
+      });
+    }
   }
 
   render() {
     return (
-      <div style={{marginTop: 10}}>
-        <h5>Search</h5>
+      <div>
+        <h5>Szukaj</h5>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
             <select
-              value={this.state.carModel}
-              onChange={this.onChangeCarModel}>
+              value={this.state.car_name}
+              onChange={this.onChangeCarName}>
+                  <option value="wszystkie">Wszystkie</option>
                 <optgroup label="Popularne">
                   <option value="volkswagen">Volkswagen</option>
                   <option value="audi">Audi</option>
@@ -162,7 +175,7 @@ export default class Search extends Component {
             </select>
           </div>
           <div className="form-group">
-            <input type="submit" value="Search" className="btn btn-primary" />
+            <input type="submit" value="Szukaj" className="btn btn-primary" />
           </div>
         </form>
       </div>

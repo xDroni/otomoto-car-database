@@ -37,6 +37,7 @@ async function getData(car) {
           .find('a[class="offer-title__link"]')
           .attr('data-ad-id')
           .trim(),
+        car_name: car,
         car_model:
           $(e)
             .find('a[class="offer-title__link"]')
@@ -84,7 +85,15 @@ async function getData(car) {
             .attr('href')
             .trim()
             .replace(/#[A-Za-z0-9]*/g, '') || null,
-        car_image: image
+        car_image: image,
+        car_price: $(e)
+          .find('div[class="offer-item__price"] span span:nth-child(1)')
+          .text()
+          .trim(),
+        car_priceCurrency: $(e)
+          .find('div[class="offer-item__price"] span span:nth-child(2)')
+          .text()
+          .trim()
       };
     })
     .get();
